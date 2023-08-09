@@ -3,6 +3,11 @@ use std::path::PathBuf;
 use xmltree::Element;
 
 fn main() {
+    let food_search_list = vec!["Colombian Waffles", "Fire Toast"];
+    println!("## Searched Items:");
+    for item in food_search_list {
+        println!("{}", item);
+    }
 
     println!("## Files:");
     let files = fs::read_dir("./files").unwrap();
@@ -12,7 +17,7 @@ fn main() {
         let file_name = f.unwrap().file_name();
         let xml_path = f.unwrap().path();
         println!("File: {:?}", file_name);
-        read_xml(&xml_path);
+        read_xml(&xml_path).unwrap();
     }
 }
 
