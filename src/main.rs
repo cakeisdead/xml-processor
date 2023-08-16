@@ -1,8 +1,17 @@
 use std::{io::{self, Read}, fs::{File, self}};
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
+use time::{OffsetDateTime, format_description};
+use std::time::SystemTime;
 use xmltree::Element;
-
+const DATE_FORMAT_STR: &'static str = "EXEC_[day]_[month]_[year]-[hour]_[minute]";
 fn main() {
+    
+    // Generate execution Id
+    let dt_fmt = format_description::parse(DATE_FORMAT_STR).unwrap();
+    let now: OffsetDateTime = SystemTime::now().into();
+    let execution_id = now.format(&dt_fmt).unwrap();
+    println!("Execution Id: {:?}", &execution_id);
+
     let food_search_list = vec!["Colombian Waffles", "Fire Toast"];
     let mut data: Vec<String> = vec![];
 
@@ -13,11 +22,20 @@ fn main() {
 
     println!("\n## Files:");
     let files = fs::read_dir("./files").unwrap();
-    
+    let out_path = Path::new("./files").join(&execution_id);
+    fs::create_dir(out_path).unwrap();
+
     for file in files {
         let f = file.as_ref();
         let file_name = f.unwrap().file_name();
         let xml_path = f.unwrap().path();
+        
+        // skip if not an xml file
+        if !file_name.to_str().unwrap().ends_with(".xml") 
+        {
+            continue;
+        }
+
         println!("File: {:?}", file_name);
         read_xml(&xml_path, &mut data).unwrap();
     }
